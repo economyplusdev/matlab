@@ -1,11 +1,4 @@
-clear; clc;
-m = MemoryChip(1024,8,4);
-for i = 1:10
-    a = m.generateAddress();
-    m = m.write(a, randi([0,255]));
-    disp(['0x' dec2hex(a) ' ' num2str(m.read(a))])
-end
-classdef MemoryChip
+classdef CPU
     properties (Access=private)
         totalMemory
         dataWidth
@@ -13,8 +6,19 @@ classdef MemoryChip
         bankSize
         memory
     end
+    methods (Static)
+        function main
+            clear; clc;
+            c = CPU(1024,8,4);
+            for i = 1:10
+                a = c.generateAddress();
+                c = c.write(a, randi([0,255]));
+                disp(['0x' dec2hex(a) ' ' num2str(c.read(a))])
+            end
+        end
+    end
     methods
-        function obj = MemoryChip(tm,dw,b)
+        function obj = CPU(tm,dw,b)
             obj.totalMemory = tm;
             obj.dataWidth = dw;
             obj.banks = b;
