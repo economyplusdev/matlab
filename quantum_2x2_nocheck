@@ -1,0 +1,42 @@
+function quantumMultiplicationOutcomeFull
+a=2; b=2; prod=a*b;
+n=3; dim=2^n; target_index=prod+1;
+s=ones(dim,1)/sqrt(dim);
+D=2*(s*s')-eye(dim);
+gammaVals=linspace(0,2*pi,50);
+kVals=0:10;
+probMatrix=zeros(length(kVals),length(gammaVals));
+for j=1:length(gammaVals)
+    gamma=gammaVals(j);
+    O=eye(dim);
+    O(target_index,target_index)=exp(1i*gamma);
+    for k=0:max(kVals)
+        psi=(D*O)^k * s;
+        probMatrix(k+1,j)=abs(psi(target_index))^2;
+    end
+end
+[~,maxIdx]=max(probMatrix(:));
+[k_opt_idx,gamma_idx]=ind2sub(size(probMatrix),maxIdx);
+optimal_k=kVals(k_opt_idx);
+optimal_gamma=gammaVals(gamma_idx);
+O_opt=eye(dim);
+O_opt(target_index,target_index)=exp(1i*optimal_gamma);
+psi_final=(D*O_opt)^optimal_k * s;
+probs=abs(psi_final).^2;
+for i=1:dim
+    outcome=i-1;
+    fprintf('Outcome: %d, Probability: %.4f\n', outcome, probs(i));
+end
+[X,Y]=meshgrid(gammaVals,kVals);
+figure
+surf(X,Y,probMatrix,'EdgeColor','none')
+colormap jet
+shading interp
+colorbar
+xlabel('\gamma')
+ylabel('Iterations (k)')
+zlabel('Probability')
+title('Amplitude Amplification for Quantum Multiplication')
+view([-45 45])
+axis tight
+end
